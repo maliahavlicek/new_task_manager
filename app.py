@@ -20,8 +20,12 @@ mongo = PyMongo(app)
 @app.route("/")
 @app.route("/get_tasks")
 def get_tasks():
-    tasks = list(mongo.db.tasks.find())
-    return render_template("tasks.html", tasks=tasks)
+    user = None
+    tasks = []
+    if session.get("user"):
+        user = session["user"]
+        tasks = list(mongo.db.tasks.find({"created_by": user.lower()}))
+    return render_template("tasks.html", tasks=tasks, user=user)
 
 
 @app.route("/search", methods=["GET", "POST"])
